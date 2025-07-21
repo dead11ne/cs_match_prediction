@@ -10,6 +10,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 pd.options.mode.chained_assignment = None 
 
+import time
+start_time = time.time()  # Засекаем начальное время
+
 # functions
 # save csv
 def export_csv(string):
@@ -57,11 +60,11 @@ for team in main_teams:
             df_temp['team1_roster'].iloc[x], df_temp['team2_roster'].iloc[x] = df_temp['team2_roster'].iloc[x], df_temp['team1_roster'].iloc[x]
             df_temp['match_score'].iloc[x] = str_reverse(df_temp['match_score'].iloc[x])
 
-        for map_score in map_score_cols:
-            if df_temp[map_score].iloc[x] != 'No score':
-                df_temp[map_score].iloc[x] = str_reverse(df_temp[map_score].iloc[x])
-        
-            df_final = pd.concat([df_final, df_temp], ignore_index=True)
+            for map_score in map_score_cols:
+                if df_temp[map_score].iloc[x] != 'No score':
+                    df_temp[map_score].iloc[x] = str_reverse(df_temp[map_score].iloc[x])
+    
+    df_final = pd.concat([df_final, df_temp], ignore_index=True)
 
 for x in range(len(df_final['team1_roster'])):
     df_final['team1_roster'].iloc[x] = sort_roster(df_final['team1_roster'].iloc[x])
@@ -109,3 +112,7 @@ df_final.reset_index()
 
 # export cleared csv
 export_csv('final_cleared.csv')
+
+end_time = time.time()  # Засекаем конечное время
+elapsed_time = end_time - start_time  # Вычисляем разницу
+print(f"Время выполнения: {elapsed_time:.4f} секунд")
