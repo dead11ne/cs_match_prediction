@@ -1,16 +1,14 @@
 # imports 
 import re
+import time
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
-
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 pd.options.mode.chained_assignment = None 
 
-import time
 start_time = time.time()  # Засекаем начальное время
 
 # functions
@@ -18,13 +16,16 @@ start_time = time.time()  # Засекаем начальное время
 def export_csv(string):
     df_final.to_csv(string)
 
+
 # reverse string for maps
 def str_reverse(s):
     if '-' in s:
         temp1, temp2 = s.split("-")
         reversed_str = f'{temp2}-{temp1}'
         return reversed_str
-    else: return s
+    else: 
+        return s
+
 
 # sorting rosters
 def sort_roster(s):
@@ -32,6 +33,7 @@ def sort_roster(s):
     players.sort(key=str.lower)
     sorted_players = ' '.join(players)
     return sorted_players
+
 
 # dataset
 df = pd.read_csv('2024-01-01(correct+id).csv')
@@ -72,40 +74,34 @@ for x in range(len(df_final['team1_roster'])):
 
 # label encoding
 # for maps 
-me = LabelEncoder()
+maps_encoder = LabelEncoder()
 maps = pd.concat([df_final['map1'], df_final['map2'], df_final['map3'], df_final['map4'], df_final['map5']]).unique()
-# print(maps)
-me.fit(maps)
+maps_encoder.fit(maps)
 col_maps_to_encode = ['map1', 'map2', 'map3', 'map4', 'map5']
 for col in col_maps_to_encode:
-    df_final[col] = me.transform(df_final[col])
+    df_final[col] = maps_encoder.transform(df_final[col])
 
 # for teams 
-te = LabelEncoder()
+teams_encoder = LabelEncoder()
 teams = pd.concat([df_final['team1'], df_final['team2'], df_final['winner']]).unique()
-# print(teams)
-te.fit(teams)
+teams_encoder.fit(teams)
 col_teams_to_encode = ['team1', 'team2', 'winner']
 for col in col_teams_to_encode:
-    df_final[col] = te.transform(df_final[col])
+    df_final[col] = teams_encoder.transform(df_final[col])
 
 # for rosters
-re = LabelEncoder()
+rosters_encoder = LabelEncoder()
 rosters = pd.concat([df_final['team1_roster'], df_final['team2_roster']]).unique()
-# print(rosters)
 re.fit(rosters)
 col_rosters_to_encode = ['team1_roster', 'team2_roster']
 for col in col_rosters_to_encode:
     df_final[col] = re.transform(df_final[col])
 
 # for scores
-se = LabelEncoder()
+scores_encoder = LabelEncoder()
 scores = df_final['match_score'].unique()
-# print(scores)
-se.fit(scores)
-df_final['match_score'] = se.transform(df_final['match_score'])
-
-# graphs
+scores_encoder.fit(scores)
+df_final['match_score'] = scores_encoder.transform(df_final['match_score'])
 
 # reser indexes
 df_final.reset_index()
@@ -113,6 +109,6 @@ df_final.reset_index()
 # export cleared csv
 export_csv('final_cleared.csv')
 
-end_time = time.time()  # Засекаем конечное время
-elapsed_time = end_time - start_time  # Вычисляем разницу
+end_time = time.time()
+elapsed_time = end_time - start_time
 print(f"Время выполнения: {elapsed_time:.4f} секунд")
